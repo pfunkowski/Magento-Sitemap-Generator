@@ -1,6 +1,6 @@
 # Magento Sitemap Shell/php generator
 
-Original script by [Papertank](https://github.com/papertank) - Forked by [Maaggel](https://github.com/maaggel) @ [Klean](https://github.com/klean)
+Original script by [Papertank](https://github.com/papertank) - Forked by [Maaggel](https://github.com/maaggel)
 
 Using a custom class and Magento specific (collections) code, this simple script is designed to be used via the command line / cron job to generate a Google compatible XML sitemap.
 
@@ -46,10 +46,10 @@ Feel free to submit an issue if you find any problems or bugs, but since this is
 
 ## Development
 
-- Source hosted at [GitHub](https://github.com/klean/magento-php-sitemap)
+- Source hosted at [GitHub](https://github.com/Maaggel/Magento-Sitemap-Generator)
 - Please fork and make suggested updates and improvements
 
 ## Authors
 
-- Multistore update: [Maaggel](https://github.com/maaggel) @ [Klean](https://github.com/klean)
+- Multistore update: [Maaggel](https://github.com/maaggel)
 - Initial work: [Papertank](https://github.com/papertank)
