@@ -7,11 +7,13 @@ Mage::app();
 echo "\n\nGenerating sitemaps.. please wait..\n\n";
 
 //database adapters
+$connection = Mage::getSingleton('core/resource');
 $read = Mage::getSingleton('core/resource')->getConnection('core_read');
 $write = Mage::getSingleton('core/resource')->getConnection('core_write');
+$sitemapTableName = $connection->getTableName('sitemap');
 
 //Loop through the sitemaps
-foreach($read->fetchAll("Select * from `sitemap`") as $sitemap)
+foreach($read->fetchAll("Select * from `$sitemapTableName`") as $sitemap)
 {
 	//Get the path
 	$filePath = dirname(__FILE__).'/..'.$sitemap["sitemap_path"].$sitemap["sitemap_filename"];
@@ -24,7 +26,7 @@ foreach($read->fetchAll("Select * from `sitemap`") as $sitemap)
 
 		//Update the time
 		$write->update(
-	        "sitemap",
+	        "$sitemapTableName",
 	        array("sitemap_time" => Varien_Date::now()),
 	        "sitemap_id=".$sitemap["sitemap_id"]
 		);
@@ -63,9 +65,14 @@ function generateSitemap($filePath, $storeId)
 		unset($collection);
 		
 		//Get the categories
+		$rootId = Mage::app()->getStore($storeId)->getRootCategoryId();
 		$collection = Mage::getModel('catalog/category')
 					        ->getCollection()
+							->setStoreId($storeId)
 					        ->addAttributeToSelect('*')
+							->addFieldToFilter('path', array('like'=> "1/$rootId/%"))
+							->addFieldToFilter('include_in_menu', 1)
+							->addFieldToFilter('is_active', 1)
 					        ->addIsActiveFilter();
 		
 		//Add the categories		        
@@ -85,10 +92,11 @@ function generateSitemap($filePath, $storeId)
 							Mage_Catalog_Model_Product_Visibility::VISIBILITY_BOTH,
 							Mage_Catalog_Model_Product_Visibility::VISIBILITY_IN_CATALOG
 						));
-		
+		Mage::getSingleton('cataloginventory/stock')->addInStockFilterToCollection($collection);
 		//Add the products
 		foreach($collection as $product)
-			$sitemap->addUrl($product->getProductUrl(), $product_priority, $product->getUpdatedAt());
+			if (Mage::getBaseUrl('media').'catalog/product'.$product->getImage()!==false && $product->getImage() !== 'no_selection' && $product->getImage() !== '' && $product->getImage() !== null && $product->isAvailable())
+				$sitemap->addUrl($product->getProductUrl(), $product_priority, $product->getUpdatedAt());
 		
 		//Clear
 		unset($collection);
